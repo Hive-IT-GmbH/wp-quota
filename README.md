@@ -1,9 +1,9 @@
 # WP-CLI Quota Command 
 WP-CLI Command to easily manage quota in WordPress Multisite environments
 
-### List quota
+### List quota for all sites in network
 `wp quota list`
-`[--fields] [--format] [--url]`
+`[--fields] [--format]`
 
 ```bash
 > wp quota list
@@ -15,7 +15,6 @@ WP-CLI Command to easily manage quota in WordPress Multisite environments
 | 3       | https://dev-site.local/subsite3                        | 10000        | 9850           | 98.50               |
 +---------+--------------------------------------------------------+--------------+----------------+---------------------+
 ```
-Using --url=\<domain\> is an alias for `wp quota get <id>`
 
 ### Get quota for single site
 `wp quota get <id>`
@@ -23,7 +22,6 @@ Using --url=\<domain\> is an alias for `wp quota get <id>`
 Returns the quota information for a single site
 ```bash
 > wp quota get 3
-> wp quota list --url=dev-site.local/subsite3
 +---------+--------------------------------------------------------+--------------+----------------+---------------------+
 | blog_id | url                                                    | quota        | quota_used     | quota_used_percent  |
 +---------+--------------------------------------------------------+--------------+----------------+---------------------+
