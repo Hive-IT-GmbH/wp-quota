@@ -214,14 +214,13 @@ class Quota_Command {
 		}
 
 		if ( empty( $args ) ) {
-			WP_CLI::error( 'Need to specify a blog id.' );
-		}
-
-		global $wpdb;
-		$blog_id = $args[0];
-		$blog    = get_blog_details( $blog_id );
-		if ( ! $blog ) {
-			WP_CLI::error( 'Site not found.' );
+			$blog_id = get_current_blog_id();
+		} else {
+			$blog_id = $args[0] ?? 0;
+			$blog    = get_blog_details( $blog_id );
+			if ( ! $blog ) {
+				WP_CLI::error( 'Site not found.' );
+			}
 		}
 
 		$this->display_formatted_items( $assoc_args, $blog_id );
