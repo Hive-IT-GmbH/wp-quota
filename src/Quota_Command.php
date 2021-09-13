@@ -306,16 +306,17 @@ class Quota_Command {
 	 * [<id>]
 	 * : The id of the site to set the quota.
 	 *
-	 * [<quota-in-mb>]
-	 * : New quota value in mb
+	 * [<quota-to-add-in-mb>]
+	 * : Add quota value in mb
 	 *
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Increasing the quota of blog 2
-	 *     $ wp quota add 2 100000
+	 *     $ wp quota add 2 3500
+	 *     $ wp quota add 3500 --url=subsite.local
 	 *
-	 *     Quota is now 10000 MB for subsite2
+	 *     Quota is now 16000 MB for subsite.local
 	 *
 	 * @subcommand add
 	 */
