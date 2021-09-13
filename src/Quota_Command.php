@@ -257,7 +257,16 @@ class Quota_Command {
 			WP_CLI::error( 'Need to specify a blog id.' );
 		}
 
-		$blog_id = (int) ( $args[0] ?? 0 );
+		if ( 2 == count( $args ) ) {
+			$blog_id         = (int) ( $args[0] ?? 0 );
+			$new_quota_in_mb = (int) ( $args[1] ?? 0 );
+		}
+
+		if ( 1 == count( $args ) ) {
+			$blog_id         = get_current_blog_id();
+			$new_quota_in_mb = (int) ( $args[0] ?? 0 );
+		}
+
 		if ( $blog_id ) {
 			$blog = get_blog_details( $blog_id );
 		}
@@ -266,7 +275,6 @@ class Quota_Command {
 			WP_CLI::error( 'Site not found.' );
 		}
 
-		$new_quota_in_mb              = (int) ( $args[1] ?? 0 );
 		$global_blog_upload_max_space = get_network_option( get_current_network_id(), 'blog_upload_space' );
 		if ( $new_quota_in_mb != (int) $global_blog_upload_max_space ) {
 			switch_to_blog( $blog_id );
