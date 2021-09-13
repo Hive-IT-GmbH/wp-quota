@@ -357,5 +357,64 @@ class Quota_Command {
 
 	}
 
+	/**
+	 * Subtracts the given amount of quota to the chosen site
+	 *
+	 * ## OPTIONS
+	 *
+	 * [<id>]
+	 * : The id of the site to set the quota.
+	 *
+	 * [<quota-to-subtract-in-mb>]
+	 * : Subtract quota value in mb
+	 *
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Decreasing the quota of blog 2
+	 *     $ wp quota substract 2 2500
+	 *     $ wp quota substract 2500 --url=subsite.local
+	 *
+	 *     Quota is now 10000 MB for subsite.local
+	 *
+	 * @subcommand substract
+	 */
+	public function substract( $args, $assoc_args ) {
+		if ( ! is_multisite() ) {
+			WP_CLI::error( 'This is not a multisite installation.' );
+		}
+
+		if ( empty( $args ) ) {
+			WP_CLI::error( 'Need to specify a blog id.' );
+		}
+
+		if ( 2 == count( $args ) ) {
+			$blog_id               = (int) ( $args[0] ?? 0 );
+			$substract_quota_in_mb = (int) ( $args[1] ?? 0 );
+		}
+
+		if ( 1 == count( $args ) ) {
+			$blog_id               = get_current_blog_id();
+			$substract_quota_in_mb = (int) ( $args[0] ?? 0 );
+		}
+
+		if ( $blog_id ) {
+			$blog = get_blog_details( $blog_id );
+		}
+
+		if ( ! $blog ) {
+			WP_CLI::error( 'Site not found.' );
+		}
+
+		switch_to_blog( $blog_id );
+		$quota           = get_space_allowed();
+		$new_quota_in_mb = $quota - $substract_quota_in_mb;
+
+		$this->set_new_quota( $new_quota_in_mb, $blog );
+
+		restore_current_blog();
+
+	}
+
 
 }
