@@ -141,13 +141,13 @@ class Quota_Command {
 		switch_to_blog( $blog->blog_id );
 
 		// Get quota
-		$quota       = get_space_allowed(); // * MB_IN_BYTES  ???;
+		$quota       = get_space_allowed();
 		$blog->quota = $quota;
 
 		// Get quota used & quota used in percent
-		$used = get_space_used(); // * MB_IN_BYTES ???;
+		$used = get_space_used();
 
-		if ( $used > $quota ) {
+		if ( $used >= $quota ) {
 			$percentused = '100';
 		} else {
 			$percentused = ( $used / $quota ) * 100;
