@@ -275,15 +275,86 @@ class Quota_Command {
 			WP_CLI::error( 'Site not found.' );
 		}
 
-		$global_blog_upload_max_space = get_network_option( get_current_network_id(), 'blog_upload_space' );
-		if ( $new_quota_in_mb != (int) $global_blog_upload_max_space ) {
-			switch_to_blog( $blog_id );
-			$site_url = trailingslashit( $blog->siteurl );
-			update_option( 'blog_upload_space', $new_quota_in_mb );
-			WP_CLI::success( "Quota is now {$new_quota_in_mb} MB for {$site_url}." );
-		}
+		switch_to_blog( $blog_id );
+
+		$this->set_new_quota( $new_quota_in_mb, $blog );
 
 		restore_current_blog();
 
 	}
+
+	/**
+	 * Set the new blog quota
+	 *
+	 * @param $new_quota_in_mb
+	 * @param $blog
+	 */
+	private function set_new_quota( $new_quota_in_mb, $blog ) {
+		$global_blog_upload_max_space = get_network_option( get_current_network_id(), 'blog_upload_space' );
+		if ( $new_quota_in_mb != (int) $global_blog_upload_max_space ) {
+			$site_url = trailingslashit( $blog->siteurl );
+			update_option( 'blog_upload_space', $new_quota_in_mb );
+			WP_CLI::success( "Quota is now {$new_quota_in_mb} MB for {$site_url}." );
+		}
+	}
+
+	/**
+	 * Adds the given amount of quota to the chosen site
+	 *
+	 * ## OPTIONS
+	 *
+	 * [<id>]
+	 * : The id of the site to set the quota.
+	 *
+	 * [<quota-in-mb>]
+	 * : New quota value in mb
+	 *
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Increasing the quota of blog 2
+	 *     $ wp quota add 2 100000
+	 *
+	 *     Quota is now 10000 MB for subsite2
+	 *
+	 * @subcommand add
+	 */
+	public function add( $args, $assoc_args ) {
+		if ( ! is_multisite() ) {
+			WP_CLI::error( 'This is not a multisite installation.' );
+		}
+
+		if ( empty( $args ) ) {
+			WP_CLI::error( 'Need to specify a blog id.' );
+		}
+
+		if ( 2 == count( $args ) ) {
+			$blog_id         = (int) ( $args[0] ?? 0 );
+			$add_quota_in_mb = (int) ( $args[1] ?? 0 );
+		}
+
+		if ( 1 == count( $args ) ) {
+			$blog_id         = get_current_blog_id();
+			$add_quota_in_mb = (int) ( $args[0] ?? 0 );
+		}
+
+		if ( $blog_id ) {
+			$blog = get_blog_details( $blog_id );
+		}
+
+		if ( ! $blog ) {
+			WP_CLI::error( 'Site not found.' );
+		}
+
+		switch_to_blog( $blog_id );
+		$quota           = get_space_allowed();
+		$new_quota_in_mb = $quota + $add_quota_in_mb;
+
+		$this->set_new_quota( $new_quota_in_mb, $blog );
+
+		restore_current_blog();
+
+	}
+
+
 }
