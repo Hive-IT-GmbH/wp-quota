@@ -226,4 +226,56 @@ class Quota_Command {
 		$this->display_formatted_items( $assoc_args, $blog_id );
 
 	}
+
+	/**
+	 * Sets the quota for the chosen site to the given value
+	 *
+	 * ## OPTIONS
+	 *
+	 * [<id>]
+	 * : The id of the site to set the quota.
+	 *
+	 * [<quota-in-mb>]
+	 * : New quota value in mb
+	 *
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Set the quota of blog 2
+	 *     $ wp quota set 2 100000
+	 *
+	 *     Quota is now 10000 MB for subsite2
+	 *
+	 * @subcommand set
+	 */
+	public function set( $args, $assoc_args ) {
+		if ( ! is_multisite() ) {
+			WP_CLI::error( 'This is not a multisite installation.' );
+		}
+
+		if ( empty( $args ) ) {
+			WP_CLI::error( 'Need to specify a blog id.' );
+		}
+
+		$blog_id = (int) ( $args[0] ?? 0 );
+		if ( $blog_id ) {
+			$blog = get_blog_details( $blog_id );
+		}
+
+		if ( ! $blog ) {
+			WP_CLI::error( 'Site not found.' );
+		}
+
+		$new_quota_in_mb              = (int) ( $args[1] ?? 0 );
+		$global_blog_upload_max_space = get_network_option( get_current_network_id(), 'blog_upload_space' );
+		if ( $new_quota_in_mb != (int) $global_blog_upload_max_space ) {
+			switch_to_blog( $blog_id );
+			$site_url = trailingslashit( $blog->siteurl );
+			update_option( 'blog_upload_space', $new_quota_in_mb );
+			WP_CLI::success( "Quota is now {$new_quota_in_mb} MB for {$site_url}." );
+		}
+
+		restore_current_blog();
+
+	}
 }
