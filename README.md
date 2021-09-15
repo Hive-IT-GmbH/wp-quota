@@ -60,7 +60,7 @@ Quota is now 16000 MB for subsite.local
 
 `wp quota subtract <quota-to-subtract-in-mb> --url=<domain>`
 
-Subtracts the given amount of quota from the chosen site
+Subtract the given amount of quota from the chosen site
 ```bash
 > wp quota subtract 2 2500
 > wp quota subtract 2500 --url=subsite.local

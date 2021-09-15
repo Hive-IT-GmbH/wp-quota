@@ -291,11 +291,13 @@ class Quota_Command {
 	 */
 	private function set_new_quota( $new_quota_in_mb, $blog ) {
 		$global_blog_upload_max_space = get_network_option( get_current_network_id(), 'blog_upload_space' );
+		$site_url                     = trailingslashit( $blog->siteurl );
 		if ( $new_quota_in_mb != (int) $global_blog_upload_max_space ) {
-			$site_url = trailingslashit( $blog->siteurl );
 			update_option( 'blog_upload_space', $new_quota_in_mb );
-			WP_CLI::success( "Quota is now {$new_quota_in_mb} MB for {$site_url}." );
+		} else {
+			delete_option( 'blog_upload_space' );
 		}
+		WP_CLI::success( "Quota is now {$new_quota_in_mb} MB for {$site_url}." );
 	}
 
 	/**
@@ -326,7 +328,7 @@ class Quota_Command {
 		}
 
 		if ( empty( $args ) ) {
-			WP_CLI::error( 'Need to specify a blog id.' );
+			WP_CLI::error( 'Please specify [<blog_id> <quota-to-add>] or [<quota-to-add-to-current-site>]' );
 		}
 
 		if ( 2 == count( $args ) ) {
@@ -358,7 +360,7 @@ class Quota_Command {
 	}
 
 	/**
-	 * Subtracts the given amount of quota to the chosen site
+	 * Subtract the given amount of quota to the chosen site
 	 *
 	 * ## OPTIONS
 	 *
@@ -385,7 +387,7 @@ class Quota_Command {
 		}
 
 		if ( empty( $args ) ) {
-			WP_CLI::error( 'Need to specify a blog id.' );
+			WP_CLI::error( 'Please specify [<blog_id> <quota-to-subtract>] or [<quota-to-substract-from-current-site>]' );
 		}
 
 		if ( 2 == count( $args ) ) {
@@ -403,7 +405,7 @@ class Quota_Command {
 		}
 
 		if ( ! $blog ) {
-			WP_CLI::error( 'Site not found.' );
+			WP_CLI::error( 'Site with ID ' . $blog_id . ' not found.' );
 		}
 
 		switch_to_blog( $blog_id );
