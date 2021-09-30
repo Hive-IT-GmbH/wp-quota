@@ -1,0 +1,30 @@
+{
+  "name": "hive-it/wp-quota",
+  "description": "WP-CLI Command to easily manage quota in WordPress Multisite environments",
+  "type": "wp-cli-package",
+  "homepage": "https://github.com/Hive-IT-GmbH/wp-quota",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Hive-IT GmbH",
+      "email": "service@hive-it.de",
+      "homepage": "https://hive-it.de"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "wp-cli/wp-cli": "^2.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "": "src/",
+      "WP_CLI\\": "src/WP_CLI"
+    },
+    "files": [
+      "quota-command.php"
+    ]
+  },
+  "support": {
+    "issues": "https://github.com/Hive-IT-GmbH/wp-quota/issues"
+  }
+}
