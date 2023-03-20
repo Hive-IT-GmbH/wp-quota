@@ -235,14 +235,15 @@ class Quota_Command {
 	 * [<id>]
 	 * : The id of the site to set the quota.
 	 *
-	 * [<quota-in-mb>]
-	 * : New quota value in mb
+     * [<quota-to-add>]
+     * : New quota value in mb or gb (add suffix "g" to amount to set in gb)
 	 *
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Set the quota of blog 2
-	 *     $ wp quota set 2 100000
+     *     $ wp quota set 2 100000
+     *     $ wp quota set 2 10g
 	 *
 	 *     Quota is now 10000 MB for subsite2
 	 *
@@ -259,12 +260,12 @@ class Quota_Command {
 
 		if ( 2 == count( $args ) ) {
 			$blog_id         = (int) ( $args[0] ?? 0 );
-			$new_quota_in_mb = (int) ( $args[1] ?? 0 );
+			$new_quota_in_mb = self::get_quota_in_mb_from_arg( $args[1] ?? 0 );
 		}
 
 		if ( 1 == count( $args ) ) {
 			$blog_id         = get_current_blog_id();
-			$new_quota_in_mb = (int) ( $args[0] ?? 0 );
+			$new_quota_in_mb = self::get_quota_in_mb_from_arg( $args[0] ?? 0 );
 		}
 
 		if ( $blog_id ) {
@@ -308,15 +309,18 @@ class Quota_Command {
 	 * [<id>]
 	 * : The id of the site to set the quota.
 	 *
-	 * [<quota-to-add-in-mb>]
-	 * : Add quota value in mb
+	 * [<quota-to-add>]
+	 * : Add quota value in mb or gb (add suffix "g" to amount to increase in gb)
 	 *
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Increasing the quota of blog 2
 	 *     $ wp quota add 2 3500
-	 *     $ wp quota add 3500 --url=subsite.local
+     *     $ wp quota add 3500 --url=subsite.local
+     *          # Increases quota by 3,5gb (3500 MB)
+     *     $ wp quota add 5g --url=subsite.local
+     *          # Increases quota by 5gb
 	 *
 	 *     Quota is now 16000 MB for subsite.local
 	 *
@@ -333,12 +337,12 @@ class Quota_Command {
 
 		if ( 2 == count( $args ) ) {
 			$blog_id         = (int) ( $args[0] ?? 0 );
-			$add_quota_in_mb = (int) ( $args[1] ?? 0 );
+			$add_quota_in_mb = self::get_quota_in_mb_from_arg( $args[1] ?? 0 );
 		}
 
 		if ( 1 == count( $args ) ) {
 			$blog_id         = get_current_blog_id();
-			$add_quota_in_mb = (int) ( $args[0] ?? 0 );
+			$add_quota_in_mb = self::get_quota_in_mb_from_arg( $args[0] ?? 0 );
 		}
 
 		if ( $blog_id ) {
@@ -359,6 +363,26 @@ class Quota_Command {
 
 	}
 
+    /**
+     * Parses a n argument value and calculates the megabyte value. If the given number has suffix "g" the value will be multiplied by 1024
+     * @param string $arg the argument in format <int><suffix g or m> like 23g
+     * @return int the numeric value representing the megabytes
+     */
+    private static function get_quota_in_mb_from_arg(string $arg): int  {
+        $matches[] = preg_match("/^([0-9]+)([gm]?)$/", $arg, $matches);
+        $quota_in_mb = 0;
+        if (count($matches) >= 3) {
+            $quota_in_mb = intval($matches[1]);
+            if (!empty($matches[2]) && $matches[2] == "g") {
+                $quota_in_mb *= 1024;
+            }
+        } else {
+            print_r($matches);
+            WP_CLI::error( 'Error parsing Quota value' );
+        }
+        return $quota_in_mb;
+    }
+
 	/**
 	 * Subtract the given amount of quota to the chosen site
 	 *
@@ -367,19 +391,21 @@ class Quota_Command {
 	 * [<id>]
 	 * : The id of the site to set the quota.
 	 *
-	 * [<quota-to-subtract-in-mb>]
-	 * : Subtract quota value in mb
+	 * [<quota-to-subtract>]
+	 * : Subtract quota value in mb or gb
 	 *
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Decreasing the quota of blog 2
-	 *     $ wp quota substract 2 2500
-	 *     $ wp quota substract 2500 --url=subsite.local
+	 *     $ wp quota subtract 2 2500
+     *     $ wp quota subtract 2500 --url=subsite.local
+     *     $ wp quota subtract 5g --url=subsite.local
+     *          # Decreases quota by 5gb
 	 *
 	 *     Quota is now 10000 MB for subsite.local
 	 *
-	 * @subcommand substract
+	 * @subcommand subtract
 	 */
 	public function substract( $args, $assoc_args ) {
 		if ( ! is_multisite() ) {
@@ -389,15 +415,17 @@ class Quota_Command {
 		if ( empty( $args ) ) {
 			WP_CLI::error( 'Please specify [<blog_id> <quota-to-subtract>] or [<quota-to-substract-from-current-site>]' );
 		}
+        
+        $substract_quota_in_mb = 0;
 
 		if ( 2 == count( $args ) ) {
 			$blog_id               = (int) ( $args[0] ?? 0 );
-			$substract_quota_in_mb = (int) ( $args[1] ?? 0 );
+			$substract_quota_in_mb = self::get_quota_in_mb_from_arg( $args[1] ?? 0 );
 		}
 
 		if ( 1 == count( $args ) ) {
 			$blog_id               = get_current_blog_id();
-			$substract_quota_in_mb = (int) ( $args[0] ?? 0 );
+			$substract_quota_in_mb = self::get_quota_in_mb_from_arg( $args[0] ?? 0 );
 		}
 
 		if ( $blog_id ) {
