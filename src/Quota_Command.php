@@ -244,7 +244,7 @@ class Quota_Command {
      * [<id>]
      * : The id of the site to set the quota.
      *
-     * [<quota-to-add>]
+     * [<quota-in-mb>]
      * : New quota value in mb or gb (add suffix "g" to amount to set in gb)
      *
      *
@@ -425,16 +425,16 @@ class Quota_Command {
             WP_CLI::error( 'Please specify [<blog_id> <quota-to-subtract>] or [<quota-to-substract-from-current-site>]' );
         }
 
-        $substract_quota_in_mb = 0;
+        $subtract_quota_in_mb = 0;
 
         if ( 2 == count( $args ) ) {
             $blog_id               = (int) ( $args[0] ?? 0 );
-            $substract_quota_in_mb = self::get_quota_in_mb_from_arg( $args[1] ?? 0 );
+            $subtract_quota_in_mb = self::get_quota_in_mb_from_arg( $args[1] ?? 0 );
         }
 
         if ( 1 == count( $args ) ) {
             $blog_id               = get_current_blog_id();
-            $substract_quota_in_mb = self::get_quota_in_mb_from_arg( $args[0] ?? 0 );
+            $subtract_quota_in_mb = self::get_quota_in_mb_from_arg( $args[0] ?? 0 );
         }
 
         if ( $blog_id ) {
@@ -447,7 +447,7 @@ class Quota_Command {
 
         switch_to_blog( $blog_id );
         $quota           = get_space_allowed();
-        $new_quota_in_mb = $quota - $substract_quota_in_mb;
+        $new_quota_in_mb = $quota - $subtract_quota_in_mb;
 
         $this->set_new_quota( $new_quota_in_mb, $blog );
 
