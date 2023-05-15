@@ -32,38 +32,41 @@ Returns the quota information for a single site
 ### Set Quota
 `wp quota set <id> <quota-in-mb>`
 
-`wp quota set <quota-in-mb> --url=<domain>`
+`wp quota set <quota> --url=<domain>`
 
-Sets the quota for the chosen site to the given value
+Sets the quota for the chosen site to the given value. The value may have the suffix "m" or "g" to indicate that the value is given in gigabyte or megabyte. If no suffix is given megabyte is assumed. 
 ```bash
 > wp quota set 2 10000
 > wp quota set 10000 --url=subsite.local
+> wp quota set 10g --url=subsite.local
 
 Quota is now 10000 MB for subsite.local 
 ```
 
 ### Increase Quota
-`wp quota add <id> <quota-to-add-in-mb>`
+`wp quota add <id> <quota-to-add>`
 
-`wp quota add  <quota-to-add-in-mb> --url=<domain>`
+`wp quota add  <quota-to-add-in> --url=<domain>`
 
-Adds the given amount of quota to the chosen site
+Adds the given amount of quota to the chosen site. The value may have the suffix "m" or "g" to indicate that the value is given in gigabyte or megabyte. If no suffix is given megabyte is assumed.
 ```bash
 > wp quota add 2 3500
 > wp quota add 3500 --url=subsite.local
+> wp quota add 3g --url=subsite.local
 
 Quota is now 16000 MB for subsite.local 
 ```
 
 ### Decrease Quota
-`wp quota subtract <id> <quota-to-add-in-mb>`
+`wp quota subtract <id> <quota-to-add>`
 
-`wp quota subtract <quota-to-subtract-in-mb> --url=<domain>`
+`wp quota subtract <quota-to-subtract> --url=<domain>`
 
-Subtract the given amount of quota from the chosen site
+Subtract the given amount of quota from the chosen site. The value may have the suffix "m" or "g" to indicate that the value is given in gigabyte or megabyte. If no suffix is given megabyte is assumed.
 ```bash
 > wp quota subtract 2 2500
 > wp quota subtract 2500 --url=subsite.local
+> wp quota subtract 3g --url=subsite.local
 
 Quota is now 10000 MB for subsite.local 
 ```
